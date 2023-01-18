@@ -42,8 +42,8 @@ function createUser(username, password) {
 
 /**
  * Check and compare input with password from DynamoDB
- * @param {*} password input
- * @param {*} dbPassword Load hash from your password DB.
+ * @param {String} password input
+ * @param {String} dbPassword Load hash from your password DB.
  * @return {Boolean} 
  */
 function checkPassword(password, dbPassword) {
