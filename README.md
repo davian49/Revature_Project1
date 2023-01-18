@@ -41,11 +41,11 @@ The login/register feature is meant to give you preliminary experience handling
 authentication within an application. These features allow you to ensure you can track 
 or maintain who can connect to your application. Here are the user stories:
     - As an Employee or Manager, I should be able to log into the application.
-i. Must be able to log in with an email and password
+i. Must be able to log in with an username and password
 • Ability to register a new account 
-i. You must ensure the email is not already registered 
+i. You must ensure the username is not already registered 
 ii. Default to an employee role 
-iii. Should register with at least an email and password
+iii. Should register with at least an username and password
 Here is a link to all the support content that is provided for this phase 1 feature:
 Login/Register Feature Support
 2. Submit Ticket Feature

@@ -47,7 +47,6 @@ TicketSystem.prototype.submitTicket = function(ticket) {
 }
 /**
  * View request tickets to system
- * @param {String} role Manager or Employee
  * @return {Array<Ticket>} ticket 
  */
 TicketSystem.prototype.viewTickets = function() {

@@ -9,11 +9,12 @@ class Employee extends User {
     /**
      * 
      * @param {Number} id
-     * @param {String} email
+     * @param {String} username
      * @param {String} password
      */
-    constructor(id, email, password) {
-        super(id, email, password);
+    constructor(id, username, password) {
+        super(id, username, password);
+        this.role = "employee";
     }
 }
 /**

@@ -1,56 +1,118 @@
-const fs = require('fs');
-const User = require('../model/User');
-const path = './repository/users.json'
-const users = JSON.parse(fs.readFileSync(path, 'utf-8'))
+let uniqid = require('uniqid'); 
+const userDAO = require('./server')
+const bcrypt = require('bcrypt');
+const salt = 10;
 
-// CREATE
 /**
- * Register new user to database, returns true if successful
- * @param {String} email
- * @param {String} password
- * @returns true if User registered successfully
+ * Hashes password with bcrypt
+ * @param {String} password to be encrypted
+ * @return {bcrypt} encrypted password
  */
-function register(email, password) {
-    let id = JSON.parse(fs.readFileSync(path, 'utf-8')).length;
-    if (!checkUser(email)) {
-        let newUser = new User(id, email, password)
-        users.push(newUser)
-        let data = JSON.stringify(users)
-        fs.writeFileSync(path, data)
-        return true
-    }; 
-    return false;       
-};
-// READ
-/**
- * Checks User database for existing user, returns true if successful
- * @param {String} email
- * @param {String} password
- * @returns true if User is in database
- */
-function login(email, password) {
-    //let users = JSON.parse(fs.readFileSync(path, 'utf-8'));
-    for (let i = 0; i < users.length; i++) {
-        if(users[i].email === email && users[i].password === password) {
-            return true;
-        } else {
-            return false;    
-        };
-    };        
-};
+function hash(password) {return bcrypt.hashSync(password, salt);} 
 
-function checkUser(email) {
-    let users = JSON.parse(fs.readFileSync(path, 'utf-8'));
-    for (let i = 0; i < users.length; i++) {
-        if(users[i].email === email) {
-            return true; 
-        };
+
+// CRUD Operations on DynameDB (put, get, update, delete)
+// CREATE User
+/**
+ * Create user in DynameDB table with uniqid
+ * @property {uniqid} id a prefixed unique identifier based on the current time
+ * @param {String} username 
+ * @param {String} password
+ * @property {String} role employee by default
+ */
+function createUser(username, password) {
+    // Params for DynamoDB "put"
+    const params = {
+        TableName: 'users',
+        Item: {
+            id: uniqid(),
+            username: username,
+            password: hash(password),
+            role: "employee"
+        }
     };
-    return false
+    userDAO.put(params, (err) =>{
+        if(err) {
+            console.log(err)
+        } else {
+            console.log(`Successfully added ${params.Item.username} with id: ${params.Item.id} and role: "${params.Item.role}" to table ${params.TableName}`)
+        }
+    })
+};
+
+/**
+ * Check and compare input with password from DynamoDB
+ * @param {*} password input
+ * @param {*} dbPassword Load hash from your password DB.
+ * @return {Boolean} 
+ */
+function checkPassword(password, dbPassword) {
+    return bcrypt.compareSync(password, dbPassword);
+}
+/**
+ * Check DynamoDB for username using query 
+ * Time complexity O(1)
+ * @param {String} username 
+ */
+function checkUserName(username) {
+    const params = {
+        TableName: 'users',
+        // IndexName: 'username',
+        KeyConditionExpression: '#u = :value',
+        ExpressionAttributeNames: {
+            "#u": "username"
+        },
+        ExpressionAttributeValues: {
+            ":value": username
+        }
+    };
+    
+    userDAO.query(params, (err, data) => {
+        if (err) {
+            console.log(err);
+        } else {
+            if (data) {
+                console.log(`Username "${username}" found.`)
+            } else {
+                console.log(`Username "${username}" not found. Have you registered an account ?`)
+            }
+            
+        }
+    });
+}
+/**
+ * Login to DynamoDB with user input
+ * @param {String} username 
+ * @param {String} password to be compared to DynamoDB useer password 
+ */
+function loginUser(username, password) {
+    const params = {
+        TableName: 'users',
+        Key: {
+            username: username
+        }
+    };
+    
+    userDAO.get(params, (err, data) => {
+        if (err) {
+            console.log(err)
+        } else {
+            if (data.Item &&  checkPassword(password, data.Item.password)) {
+               console.log(`Successfully logged in as ${username}`) 
+            } else {
+                console.log("Wrong username or password")
+            }
+            
+        }
+    })
 }
 
+// ADD User
+// UPDATE User
+// DELETE User
+
 module.exports = {
-    register,
-    login,
-    checkUser
+    createUser,
+    loginUser,
+    checkUserName
 }

@@ -1,18 +1,19 @@
 const Ticket = require("./ticket");
 const User = require("./User");
 const TicketSystem = require("./TicketSystem");
-
+// Need to add ability to change role, and documentation for this object
 /**
  */
 class Manager extends User {
     /**
      * 
      * @param {Number} id
-     * @param {String} email
+     * @param {String} username
      * @param {String} password
      */
-    constructor(id, email, password) {
-        super(id, email, password);
+    constructor(id, username, password) {
+        super(id, username, password);
+        this.role = "manager"
     };
 };
 /**

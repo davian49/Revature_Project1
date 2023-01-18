@@ -1,6 +1,6 @@
 const Employee = require('./Employee');
 const Manager = require('./Manager');
-const Ticket = require('./ticket');
+//const Ticket = require('./ticket');
 const TicketSystem = require('./TicketSystem');
 
 let id = 0;
