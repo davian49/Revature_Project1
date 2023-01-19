@@ -1,10 +1,7 @@
-const userDAO = require('./server')
+const userDAO = require('./dynamoDB')
 const bcrypt = require('bcrypt');
 const User = require('../model/User');
 const salt = 10;
-
-
-
 
 // CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User

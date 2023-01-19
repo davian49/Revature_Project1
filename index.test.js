@@ -1,6 +1,6 @@
-const udao = require('./controller/userDAO')
+const udao = require('./repository/userDAO')
 const prompt = require('prompt-sync')();
-const tdao = require('./controller/ticketDAO')
+const tdao = require('./repository/ticketDAO')
 const Ticket = require('./model/ticket')
 
 

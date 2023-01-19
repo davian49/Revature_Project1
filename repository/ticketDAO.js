@@ -1,9 +1,5 @@
-const ticketDAO = require('./server')
+const ticketDAO = require('./dynamoDB')
 const Ticket = require('../model/Ticket');
-
-
-
-
 
 // CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User
