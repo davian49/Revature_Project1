@@ -1,13 +1,12 @@
-const dao = require('./controller/userDAO')
+const udao = require('./controller/userDAO')
 const prompt = require('prompt-sync')();
+const tdao = require('./controller/ticketDAO')
+const Ticket = require('./model/ticket');
+const User = require('./model/User');
 
 
 
 const name = prompt('Enter a username: ');
 const pass = prompt('Enter a password: ');
-dao.createUser(name, pass)
-
-dao.loginUser("user3", "pass"); // Successfully logged in as user3
-
-
-
+let user = new User(name,pass)
+udao.createUser(user) // Successfully added name with id: 4ssivga0ld36tc0b and role: "employee" to table users

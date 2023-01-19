@@ -1,34 +1,26 @@
-let uniqid = require('uniqid'); 
 const userDAO = require('./server')
 const bcrypt = require('bcrypt');
+const User = require('../model/User');
 const salt = 10;
 
-/**
- * Hashes password with bcrypt
- * @param {String} password to be encrypted
- * @return {bcrypt} encrypted password
- */
-function hash(password) {return bcrypt.hashSync(password, salt);} 
 
 
-// CRUD Operations on DynameDB (put, get, update, delete)
+
+// CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User
 /**
- * Create user in DynameDB table with uniqid
- * @property {uniqid} id a prefixed unique identifier based on the current time
- * @param {String} username 
- * @param {String} password
- * @property {String} role employee by default
+ * Create user in DynamoDB table
+ * @param {User} user 
  */
-function createUser(username, password) {
+function createUser(user) {
     // Params for DynamoDB "put"
     const params = {
         TableName: 'users',
         Item: {
-            id: uniqid(),
-            username: username,
-            password: hash(password),
-            role: "employee"
+            id: user.id,
+            username: user.username,
+            password: user.password,
+            role: user.role
         }
     };
     userDAO.put(params, (err) =>{
@@ -78,7 +70,7 @@ function checkUserName(username) {
             }
             
         }
-    });
+    }).promise();
 }
 /**
  * Login to DynamoDB with user input
@@ -101,10 +93,9 @@ function loginUser(username, password) {
                console.log(`Successfully logged in as ${username}`) 
             } else {
                 console.log("Wrong username or password")
-            }
-            
+            }        
         }
-    })
+    }).promise()
 }
 
 // ADD User
