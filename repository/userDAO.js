@@ -9,7 +9,7 @@ const salt = 10;
  * Create user in DynamoDB table
  * @param {User} user 
  */
-function createUser(user) {
+async function createUser(user) {
     // Params for DynamoDB "put"
     const params = {
         TableName: 'users',
@@ -20,13 +20,13 @@ function createUser(user) {
             role: user.role
         }
     };
-    userDAO.put(params, (err) =>{
+    userDAO.put(params, async (err) =>{
         if(err) {
             console.log(err)
         } else {
             console.log(`Successfully added ${params.Item.username} with id: ${params.Item.id} and role: "${params.Item.role}" to table ${params.TableName}`)
         }
-    })
+    }).promise()
 };
 
 /**
@@ -39,35 +39,20 @@ function checkPassword(password, dbPassword) {
     return bcrypt.compareSync(password, dbPassword);
 }
 /**
- * Check DynamoDB for username using query 
- * Time complexity O(1)
+ * Check DynamoDB for username using get
  * @param {String} username 
  */
-function checkUserName(username) {
+async function retrieveUserName(username, password) {
     const params = {
         TableName: 'users',
         // IndexName: 'username',
-        KeyConditionExpression: '#u = :value',
-        ExpressionAttributeNames: {
-            "#u": "username"
-        },
-        ExpressionAttributeValues: {
-            ":value": username
+        Key: {
+            username
         }
     };
+    let data = await userDAO.get(params).promise().then()
     
-    userDAO.query(params, (err, data) => {
-        if (err) {
-            console.log(err);
-        } else {
-            if (data) {
-                console.log(`Username "${username}" found.`)
-            } else {
-                console.log(`Username "${username}" not found. Have you registered an account ?`)
-            }
-            
-        }
-    }).promise();
+    return data ;
 }
 /**
  * Login to DynamoDB with user input
@@ -81,7 +66,7 @@ function loginUser(username, password) {
             username: username
         }
     };
-    
+    // Get user from DynamoDB
     userDAO.get(params, (err, data) => {
         if (err) {
             console.log(err)
@@ -102,5 +87,6 @@ function loginUser(username, password) {
 module.exports = {
     createUser,
     loginUser,
-    checkUserName
+    retrieveUserName,
+    checkPassword
 }

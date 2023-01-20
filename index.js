@@ -1,7 +1,10 @@
-const listen = require('./controller/listener')
+const app = require('./controller/handler');
+const PORT = 3000;
 
-listen.get('/', (req, res) => {
-    res.send("Hello world!");
+app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`);
 });
+
+
 
 
