@@ -5,8 +5,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 /**
  * Creates JSON Web Token with signature
- * @param {*} username 
- * @param {*} role "employee" or "manager"
+ * @param {String} username 
+ * @param {String} role "employee" or "manager"
  * @returns {String} JSON Web Token
  */
 function generateAccessToken(username, role) {
