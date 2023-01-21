@@ -4,7 +4,7 @@ const Ticket = require('../model/Ticket');
 // CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User
 /**
- * Create ticket in DynamoDB table with uniqid
+ * Create ticket in DynamoDB table
  * @param {Ticket} newTicket 
  */
 function insertTicket(newTicket) {

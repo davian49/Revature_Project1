@@ -1,7 +1,9 @@
 const app = require('./server')
 const {retrieveUserName, checkPassword, registerUser} = require('../repository/userDAO');
+const { insertTicket } = require('../repository/ticketDAO');
 const { generateAccessToken, verifyAccessToken} = require('./util/jwt-util');
 const User = require('../model/User');
+const Ticket = require('../model/Ticket');
 
 // READ
 app.post('/login', async (req, res) => {
@@ -19,7 +21,10 @@ app.post('/login', async (req, res) => {
             res.json({
                 login: true,
                 token: token,
-                data: data.Item.username
+                data: {
+                    username: data.Item.username,
+                    id: data.Item.id
+                }
             })
         }  else {
             // if username and password dont match the database
@@ -69,7 +74,7 @@ app.get('/employee', (req, res) => {
     }
 });
 
-// endpoint for employees only, must have valid JWT in req.body
+// endpoint for managers only, must have valid JWT in req.body
 app.get('/manager', (req, res) => {
  
     // Get token value to the json body
@@ -126,6 +131,49 @@ app.post('/register', async (req, res) => {
             })
         );      
     };
+});
+
+// endpoint for employees only, must have valid JWT AND Ticket
+app.post('/submit', (req, res) => {
+ 
+    // Get token value to the json body
+    const token = req.body.token;
+    // If the token is present
+    if(token){
+ 
+        // Verify the token using jwt.verify method
+        const decode = verifyAccessToken(token)
+        if (decode.role === "employee") {
+            // if there is a ticket
+            if (req.body.ticket) {
+                // Create new ticket 
+                let ticket = new Ticket(req.body.ticket.amount, req.body.ticket.description, req.body.data.id)
+                insertTicket(ticket);
+                // and add to database
+                res.json({
+                    submit: true,
+                    data: ticket
+                });
+            } else {
+                res.status(400).send({
+                    "message": "invalid ticket request"
+                })
+            }
+            
+        } else {
+            res.status(404).send({
+                "message": "User does not have privelages"
+            })
+        }
+        //  Return response with decode data        
+    } else {
+
+        // Return response with error
+        res.json({
+            login: false,
+            data: 'error'
+        });
+    }
 });
 
 module.exports = app
