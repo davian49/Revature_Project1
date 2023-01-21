@@ -41,14 +41,12 @@ app.post('/login', async (req, res) => {
 });
     // endpoint for employees only, must have valid JWT in req.body
 app.get('/employee', (req, res) => {
- 
     // Get token value to the json body
     const token = req.body.token;
     console.log(req.body)
     console.log(req.body.token)
     // If the token is present
     if(token){
- 
         // Verify the token using jwt.verify method
         const decode = verifyAccessToken(token)
         if (decode.role === "employee") {
@@ -72,14 +70,12 @@ app.get('/employee', (req, res) => {
 });
     // endpoint for managers only, must have valid JWT in req.body
 app.get('/manager', (req, res) => {
- 
     // Get token value to the json body
     const token = req.body.token;
     console.log(req.body)
     console.log(req.body.token)
     // If the token is present
     if(token){
- 
         // Verify the token using jwt.verify method
         const decode = verifyAccessToken(token)
         if (decode.role === "manager") {
@@ -136,12 +132,10 @@ app.post('/register', async (req, res) => {
 // 4. Can submit new reimbursement tickets
     // endpoint for employees only, must have valid JWT AND Ticket
 app.post('/submit', (req, res) => {
- 
     // Get token value to the json body
     const token = req.body.token;
     // If the token is present
     if(token){
- 
         // Verify the token using jwt.verify method
         const decode = verifyAccessToken(token)
         if (decode.role === "employee") {
@@ -162,8 +156,7 @@ app.post('/submit', (req, res) => {
                 res.status(400).send({
                     "message": "invalid ticket request"
                 })
-            }
-            
+            }       
         } else {
             res.status(404).send({
                 "message": "User does not have privelages"
@@ -171,7 +164,6 @@ app.post('/submit', (req, res) => {
         }
         //  Return response with decode data        
     } else {
-
         // Return response with error
         res.json({
             login: false,
@@ -179,6 +171,7 @@ app.post('/submit', (req, res) => {
         });
     }
 });
+
 
 // 6. Pending tickets are in a queue/list that can only be seen by Managers
 
