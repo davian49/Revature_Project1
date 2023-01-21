@@ -62,3 +62,11 @@ Manager.prototype.filterTickets = function(ticketSystem, status) {
     
 };
 module.exports = Manager;
+/**
+ * Hello says hello
+ * @param {User} verb describes
+ * @return console log verb
+ */
+function hello(verb) {
+    return console.log(verb)
+}

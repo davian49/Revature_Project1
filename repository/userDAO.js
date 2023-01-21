@@ -9,7 +9,7 @@ const salt = 10;
  * Create user in DynamoDB table
  * @param {User} user 
  */
-async function createUser(user) {
+async function registerUser(user) {
     // Params for DynamoDB "put"
     const params = {
         TableName: 'users',
@@ -40,9 +40,10 @@ function checkPassword(password, dbPassword) {
 }
 /**
  * Check DynamoDB for username using get
- * @param {String} username 
+ * @param {String} username
+ * @returns data, or false if username empty 
  */
-async function retrieveUserName(username, password) {
+async function retrieveUserName(username) {
     const params = {
         TableName: 'users',
         // IndexName: 'username',
@@ -54,39 +55,13 @@ async function retrieveUserName(username, password) {
     
     return data ;
 }
-/**
- * Login to DynamoDB with user input
- * @param {String} username 
- * @param {String} password to be compared to DynamoDB useer password 
- */
-function loginUser(username, password) {
-    const params = {
-        TableName: 'users',
-        Key: {
-            username: username
-        }
-    };
-    // Get user from DynamoDB
-    userDAO.get(params, (err, data) => {
-        if (err) {
-            console.log(err)
-        } else {
-            if (data.Item &&  checkPassword(password, data.Item.password)) {
-               console.log(`Successfully logged in as ${username}`) 
-            } else {
-                console.log("Wrong username or password")
-            }        
-        }
-    }).promise()
-}
 
 // ADD User
 // UPDATE User
 // DELETE User
 
 module.exports = {
-    createUser,
-    loginUser,
+    registerUser,
     retrieveUserName,
     checkPassword
 }

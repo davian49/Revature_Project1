@@ -7,8 +7,9 @@ const salt = 13;
  */
 class User {
     /**
-     * @param {String} username
-     * @param {String} password
+     * 
+     * @param {String} username 
+     * @param {String} password 
      */
     constructor(username, password) {
         this.id = uniqid();
