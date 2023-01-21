@@ -1,5 +1,4 @@
-const app = require('./controller/handler');
-const Ticket = require('./model/Ticket');
+const app = require('./controller/app');
 const PORT = 3000;
 
 

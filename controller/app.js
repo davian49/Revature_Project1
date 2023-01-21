@@ -5,7 +5,7 @@ const { generateAccessToken, verifyAccessToken} = require('./util/jwt-util');
 const User = require('../model/User');
 const Ticket = require('../model/Ticket');
 
-// READ
+// 1. Can use a username and password to log in
 app.post('/login', async (req, res) => {
     // username and password from request body
     const username = req.body.username;
@@ -39,9 +39,7 @@ app.post('/login', async (req, res) => {
         })
     }
 });
-
-
-// endpoint for employees only, must have valid JWT in req.body
+    // endpoint for employees only, must have valid JWT in req.body
 app.get('/employee', (req, res) => {
  
     // Get token value to the json body
@@ -65,7 +63,6 @@ app.get('/employee', (req, res) => {
         }
         //  Return response with decode data        
     } else {
-
         // Return response with error
         res.json({
             login: false,
@@ -73,8 +70,7 @@ app.get('/employee', (req, res) => {
         });
     }
 });
-
-// endpoint for managers only, must have valid JWT in req.body
+    // endpoint for managers only, must have valid JWT in req.body
 app.get('/manager', (req, res) => {
  
     // Get token value to the json body
@@ -108,13 +104,16 @@ app.get('/manager', (req, res) => {
 });
 
 
-// CREATE
+// 2. Can register a new account with username and password
 app.post('/register', async (req, res) => {
     // username and password from request body
     const username = req.body.username;
     const password = req.body.password;
     // retieve username from DynamoDB
     const data = await retrieveUserName(username)
+
+
+// 3. Will notify the user if the username is unavailable
     // if username exists
     if (data.Item) {
         res.status(400).send({
@@ -133,7 +132,9 @@ app.post('/register', async (req, res) => {
     };
 });
 
-// endpoint for employees only, must have valid JWT AND Ticket
+
+// 4. Can submit new reimbursement tickets
+    // endpoint for employees only, must have valid JWT AND Ticket
 app.post('/submit', (req, res) => {
  
     // Get token value to the json body
@@ -154,6 +155,9 @@ app.post('/submit', (req, res) => {
                     submit: true,
                     data: ticket
                 });
+
+
+// 5. Will make sure the reimbursement ticket author provides a description and amount during submission
             } else {
                 res.status(400).send({
                     "message": "invalid ticket request"
@@ -175,5 +179,27 @@ app.post('/submit', (req, res) => {
         });
     }
 });
+
+// 6. Pending tickets are in a queue/list that can only be seen by Managers
+
+
+// 7. Tickets can be processed (approved or denied) by Managers
+
+
+// 8. Employees can see a list of their previous submissions
+
+/**
+ * Optional Stretch Features:
+ * 1. Reimbursement Types Features • Employees can add Reimbursement Types 
+ *  i. Travel, Lodging, Food, Other 
+ *  ii. Employees can view previous requests filtered by type
+ * 2. Change Roles Feature • Managers can change other users’ roles 
+ *  i. Employee to Manager or back to Employee
+ * 3. Upload Receipts Feature • Employees can add images of receipts to their reimbursement requests 
+ *  i. Upload and store images (in SQL or cloud storage)
+ * 4. User Accounts Feature • Track additional user information (name, address, etc.) 
+ *  i. Users can edit their account 
+ *  ii. Users can add a profile pictur
+ */
 
 module.exports = app
