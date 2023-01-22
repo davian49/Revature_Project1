@@ -2,10 +2,36 @@
 const prompt = require('prompt-sync')();
 const {retrieveUserName, checkPassword, registerUser} = require('./repository/userDAO');
 const User = require('./model/User');
+const { retrieveAllTickets, retrieveTicketsByOwner } = require('./repository/ticketDAO');
 
 
 // If login successful, returns view() to console
 login()
+// viewTickets()
+// This took 2 days to figure out
+async function viewTickets(id) {
+    let tickets;
+    try {
+        tickets = await retrieveTicketsByOwner(id) 
+    } catch(error) {
+        console.log(error)
+    } finally {
+        return tickets
+    }
+}
+
+async function getTickets () {
+    let tickets;
+    try {
+        tickets = await retrieveAllTickets() 
+    } catch(error) {
+        console.log(error)
+    } finally {
+        return tickets
+    }
+}
+
+
 
 async function login() {
     const username = prompt('Enter a username: ');
@@ -65,18 +91,35 @@ async function register() {
 }
 
 
-function view(id, username, role) {
+async function view(id, username, role) {
     console.clear()
     console.log(`Welcome to ERS v1.2.0 \t\t ${new Date()}\n
     id: ${id}
     username: ${username} 
     role: ${role}\n `)
+    let data;
     if (role === "manager") {
         let input = prompt('Would you like to view employee reimbursement tickets ? (please enter "yes" or "no")');
         if (input === "yes" || input === "Yes" || input === "y") {
-            console.log("View Tickets Coming Soon")
+            data = await getTickets()
+            // console.log(data)
+            // console.log(data.Item)
+            // console.log(data.Items)
+            
+            if (data) {
+                console.log(data);
+            } else {
+                console.log(`${data} did not retrieve any tickets`)
+            }
         }
     } else {
+        // role === employee
+        data = await viewTickets(id)
+        if (data) {
+            console.log(data);
+        } else {
+            console.log(`${data} did not retrieve any tickets`)
+        }
         let input = prompt('Would you like to submit a reimbursement ticket ? (please enter "yes" or "no")');
         if (input === "yes" || input === "Yes" || input === "y") {
             console.log("Submit Ticket Coming Soon")
@@ -84,8 +127,3 @@ function view(id, username, role) {
     }
     
 }
-
-
- 
-
-  

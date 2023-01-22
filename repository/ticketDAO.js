@@ -1,11 +1,11 @@
 const AWS = require('./aws')
 const Ticket = require('../model/Ticket');
 
-// Initialize DynameDB DAO
+// Initialize DynamoDB DAO
 const ticketDAO = new AWS.DynamoDB.DocumentClient()
 
 // CRUD Operations on DynamoDB (put, get, update, delete)
-// CREATE User
+// CREATE Ticket
 /**
  * Create ticket in DynamoDB table
  * @param {Ticket} newTicket 
@@ -31,10 +31,41 @@ function insertTicket(newTicket) {
         }
     })
 };
-// READ Ticket
+// READ Tickets
+// retrieveAllTickets()
+// Retrieves all tickets from the table
+// You can utilize scan for this
+async function retrieveAllTickets() {
+    const params = {
+        TableName: 'tickets'
+    }
+
+    return await ticketDAO.scan(params).promise();
+}
+// Smart approach (efficient O(1))
+function retrieveTicketsByOwner(ownerID) {
+    const params = {
+        TableName: 'tickets',
+        IndexName: 'ownerID-index',
+        KeyConditionExpression: '#id = :value',
+        ExpressionAttributeNames: {
+            '#id': 'ownerID'
+        },
+        ExpressionAttributeValues: {
+            ':value': ownerID
+        }
+    };
+
+    return ticketDAO.query(params).promise();
+}
 // UPDATE Ticket
 // DELETE Ticket
 
 module.exports = {
-    insertTicket
+    insertTicket,
+    retrieveAllTickets,
+    retrieveTicketsByOwner
 }
+
+
+    

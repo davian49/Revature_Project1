@@ -4,7 +4,7 @@ const tdao = require('./repository/ticketDAO')
 const Ticket = require('./model/ticket')
 
 
-
+const prompt = require('prompt-sync')();
 // const name = prompt('Enter a username: ');
 // const pass = prompt('Enter a password: ');
 // dao.loginUser(name, pass);

@@ -1,29 +1,30 @@
 const app = require('./server')
 const {retrieveUserName, checkPassword, registerUser} = require('../repository/userDAO');
-const { insertTicket } = require('../repository/ticketDAO');
+const { insertTicket, retrieveAllTickets, retrieveTicketsByOwner } = require('../repository/ticketDAO');
 const { generateAccessToken, verifyAccessToken} = require('./util/jwt-util');
 const User = require('../model/User');
 const Ticket = require('../model/Ticket');
 
 // 1. Can use a username and password to log in
 app.post('/login', async (req, res) => {
-    // username and password from request body
+    // gather username and password from request body
     const username = req.body.username;
     const password = req.body.password;
-    // retieve username from DynamoDB
+    // retieve username from DynamoDB with DAO
     const data = await retrieveUserName(username)
-    // if username exists (data is not empty)
+    // if username exists (data retrieved is not empty)
     if (!(JSON.stringify(data) === '{}')) {
         // compare password and DynamoDB password with bcrypt
         if (checkPassword(password, data.Item.password)) {
             // Create JSON Web Token to send back
-            const token = generateAccessToken(username, data.Item.role)
+            const token = generateAccessToken(username, data.Item.id, data.Item.role)
             res.json({
                 login: true,
                 token: token,
                 data: {
                     username: data.Item.username,
-                    id: data.Item.id
+                    id: data.Item.id,
+                    role: data.Item.role
                 }
             })
         }  else {
@@ -56,7 +57,9 @@ app.get('/employee', (req, res) => {
             });
         } else {
             res.status(404).send({
-                "message": "User does not have privelages"
+                "message": `Access denied ${decode.username}
+                ${decode.id}
+                ${decode.role}`
             })
         }
         //  Return response with decode data        
@@ -174,7 +177,53 @@ app.post('/submit', (req, res) => {
 
 
 // 6. Pending tickets are in a queue/list that can only be seen by Managers
+    // endpoint for employees or managers only, must have valid JWT in req.body
+app.get('/view', async (req, res) => {
+    // Get token value to the json body
+    const token = req.body.token;
+    console.log(req.body)
+    console.log(req.body.token)
+    // If the token is present
+    if(token){
+        // Verify the token using jwt.verify method
+        const decode = verifyAccessToken(token)
+        if (decode.role === "manager" || decode.role === "employee") {
+            // if role === manager or employee, return view
+            let tickets;
+            if (decode.role === "manager") {
+                tickets = await retrieveAllTickets()
+                res.json({
+                    login: true,
+                    view: true,
+                    role: decode.role,
+                    data: tickets
+                });
+            }
+            if (decode.role === "employee") {
+                tickets = await retrieveTicketsByOwner(decode.id)
+                res.json({
+                    login: true,
+                    view: true,
+                    role: decode.role,
+                    data: tickets
+                });
+            }
+        } else {
+            res.status(404).send({
+                "message": "View access denied"
+            })
+        }
+        //  Return response with decode data        
+    } else {
 
+        // Return response with error
+        res.json({
+            login: true,
+            view: false,
+            data: 'error'
+        });
+    }
+});
 
 // 7. Tickets can be processed (approved or denied) by Managers
 
