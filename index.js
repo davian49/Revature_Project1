@@ -8,3 +8,6 @@ app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });
 
+
+// npm run console || node console.js
+// starts console version of ERS

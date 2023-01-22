@@ -1,0 +1,91 @@
+// Console based version of Employee Reimbursement System
+const prompt = require('prompt-sync')();
+const {retrieveUserName, checkPassword, registerUser} = require('./repository/userDAO');
+const User = require('./model/User');
+
+
+// If login successful, returns view() to console
+login()
+
+async function login() {
+    const username = prompt('Enter a username: ');
+    const password = prompt('Enter a password: ');
+    const data = await retrieveUserName(username)
+    // if username exists (data is not empty)
+        if (!(JSON.stringify(data) === '{}')) {
+            // compare password and DynamoDB password with bcrypt
+            if (checkPassword(password, data.Item.password)) {
+                // if login matches, send back data
+                console.log(`Login accepted:
+                    id: ${data.Item.id} 
+                    username: ${data.Item.username}
+                    role: ${data.Item.role}`);
+                view(data.Item.id, data.Item.username, data.Item.role)
+                return
+            }  else {
+                // if username and password dont match the database
+                console.log('please check username or password.');
+                login();
+                return
+            }    
+        } else {               
+            console.log(`${username} does not exist, please register`);
+            register();
+            return
+        }
+    }
+
+    
+async function register() {
+    const input = prompt('Would you like to register an account (please enter "yes" or "no") ?');
+    if (input === "no" || input === "No" || input === "n") {
+        await login()
+        return
+    }
+    const username = prompt('Please enter a new username: ');
+    const data = await retrieveUserName(username)
+    // if username exists
+    if (data.Item) {
+        console.log(`"${username}" is in use, please choose another username`);
+        register()
+        return
+    } else {
+        // Create User object
+        const password = prompt('Enter a password: ');
+        let user = new User(username, password)
+        // pass User object to userDAO to put in DynamoDB
+        await registerUser(user)
+        console.log(`Successfully registered new user: 
+            id: ${user.id}
+            username: ${user.username} 
+            role: ${user.role}`)  
+        login()
+        return
+    }
+}
+
+
+function view(id, username, role) {
+    console.clear()
+    console.log(`Welcome to ERS v1.2.0 \t\t ${new Date()}\n
+    id: ${id}
+    username: ${username} 
+    role: ${role}\n `)
+    if (role === "manager") {
+        let input = prompt('Would you like to view employee reimbursement tickets ? (please enter "yes" or "no")');
+        if (input === "yes" || input === "Yes" || input === "y") {
+            console.log("View Tickets Coming Soon")
+        }
+    } else {
+        let input = prompt('Would you like to submit a reimbursement ticket ? (please enter "yes" or "no")');
+        if (input === "yes" || input === "Yes" || input === "y") {
+            console.log("Submit Ticket Coming Soon")
+        }
+    }
+    
+}
+
+
+ 
+
+  
