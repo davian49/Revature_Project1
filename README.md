@@ -29,6 +29,7 @@ Any good developer needs to understand what the requirements are really asking.
 When starting from scratch, it is imperative that a developer begins with a plan for the 
 user experience and an outline of the functionality requirements. Review the diagram 
 below:
+![Use-case-diagram](use-case-diagram.jpg)
 ## Functional Requirements
 This project’s purpose is to allow associates to develop features in a self-guided 
 environment. Completion of this project will finalize a working ERS application 
