@@ -1,7 +1,11 @@
-const userDAO = require('./dynamoDB')
+const AWS = require('./aws')
 const bcrypt = require('bcrypt');
 const User = require('../model/User');
 const salt = 10;
+
+
+// Initialize DynameDB DAO
+const userDAO = new AWS.DynamoDB.DocumentClient()
 
 // CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User

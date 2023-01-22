@@ -1,5 +1,8 @@
-const ticketDAO = require('./dynamoDB')
+const AWS = require('./aws')
 const Ticket = require('../model/Ticket');
+
+// Initialize DynameDB DAO
+const ticketDAO = new AWS.DynamoDB.DocumentClient()
 
 // CRUD Operations on DynamoDB (put, get, update, delete)
 // CREATE User
