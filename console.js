@@ -1,8 +1,8 @@
 // Console based version of Employee Reimbursement System
 const prompt = require('prompt-sync')();
-const {retrieveUserName, checkPassword, registerUser} = require('./repository/userDAO');
+const { userDAO } = require('./repository/userDAO');
 const User = require('./model/User');
-const { retrieveAllTickets, retrieveTicketsByOwner } = require('./repository/ticketDAO');
+const { ticketDAO } = require('./repository/ticketDAO');
 
 
 // If login successful, returns view() to console
@@ -12,7 +12,7 @@ login()
 async function viewTickets(id) {
     let tickets;
     try {
-        tickets = await retrieveTicketsByOwner(id) 
+        tickets = await ticketDAO.retrieveTicketsByOwner(id) 
     } catch(error) {
         console.log(error)
     } finally {
@@ -23,7 +23,7 @@ async function viewTickets(id) {
 async function getTickets () {
     let tickets;
     try {
-        tickets = await retrieveAllTickets() 
+        tickets = await ticketDAO.retrieveAllTickets() 
     } catch(error) {
         console.log(error)
     } finally {
@@ -36,11 +36,11 @@ async function getTickets () {
 async function login() {
     const username = prompt('Enter a username: ');
     const password = prompt('Enter a password: ');
-    const data = await retrieveUserName(username)
+    const data = await userDAO.retrieveUserName(username)
     // if username exists (data is not empty)
         if (!(JSON.stringify(data) === '{}')) {
             // compare password and DynamoDB password with bcrypt
-            if (checkPassword(password, data.Item.password)) {
+            if (userDAO.checkPassword(password, data.Item.password)) {
                 // if login matches, send back data
                 console.log(`Login accepted:
                     id: ${data.Item.id} 
@@ -69,7 +69,7 @@ async function register() {
         return
     }
     const username = prompt('Please enter a new username: ');
-    const data = await retrieveUserName(username)
+    const data = await userDAO.retrieveUserName(username)
     // if username exists
     if (data.Item) {
         console.log(`"${username}" is in use, please choose another username`);
@@ -80,7 +80,7 @@ async function register() {
         const password = prompt('Enter a password: ');
         let user = new User(username, password)
         // pass User object to userDAO to put in DynamoDB
-        await registerUser(user)
+        await userDAO.registerUser(user)
         console.log(`Successfully registered new user: 
             id: ${user.id}
             username: ${user.username} 

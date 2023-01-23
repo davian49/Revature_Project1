@@ -41,3 +41,5 @@ sqs.deleteQueue(params, function(err, data) {
       console.log("Success", data.QueueUrls);
     }
 });
+
+module.exports = sqs

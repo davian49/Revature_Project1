@@ -10,7 +10,7 @@ const ticketDAO = new AWS.DynamoDB.DocumentClient()
  * Create ticket in DynamoDB table
  * @param {Ticket} newTicket 
  */
-function insertTicket(newTicket) {
+ticketDAO.insertTicket = function (newTicket) {
     // Params for DynamoDB "put"
     const params = {
         TableName: 'tickets',
@@ -35,7 +35,7 @@ function insertTicket(newTicket) {
 // retrieveAllTickets()
 // Retrieves all tickets from the table
 // You can utilize scan for this
-async function retrieveAllTickets() {
+ticketDAO.retrieveAllTickets = async function () {
     const params = {
         TableName: 'tickets'
     }
@@ -43,7 +43,7 @@ async function retrieveAllTickets() {
     return await ticketDAO.scan(params).promise();
 }
 // Smart approach (efficient O(1))
-function retrieveTicketsByOwner(ownerID) {
+ticketDAO.retrieveTicketsByOwner = function (ownerID) {
     const params = {
         TableName: 'tickets',
         IndexName: 'ownerID-index',
@@ -58,14 +58,21 @@ function retrieveTicketsByOwner(ownerID) {
 
     return ticketDAO.query(params).promise();
 }
+
+ticketDAO.retrieveTicketByID = function (id) {
+    const params = {
+        TableName: 'tickets',
+        Key: {
+            "id": id
+        }
+    }
+
+    return ticketDAO.get(params).promise();
+}
 // UPDATE Ticket
 // DELETE Ticket
 
-module.exports = {
-    insertTicket,
-    retrieveAllTickets,
-    retrieveTicketsByOwner
-}
+module.exports = { ticketDAO }
 
 
     

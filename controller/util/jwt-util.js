@@ -10,7 +10,7 @@ dotenv.config();
  * @param {String} role "employee" or "manager"
  * @returns {String} JSON Web Token
  */
-function generateAccessToken(username, id, role) {
+jwt.generateAccessToken = function (username, id, role) {
     return jwt.sign({username, id, role}, process.env.TOKEN_SECRET, {expiresIn: '3d'});
 }
 /**
@@ -18,12 +18,9 @@ function generateAccessToken(username, id, role) {
  * @param {String} token generated with JWT
  * @returns jwt verified token
  */
-function verifyAccessToken(token) {
+jwt.verifyAccessToken = function (token) {
     // verify token and return payload
     return jwt.verify(token, process.env.TOKEN_SECRET)
 }
 
-module.exports = {
-    generateAccessToken,
-    verifyAccessToken
-}
+module.exports = { jwt }

@@ -13,7 +13,7 @@ const userDAO = new AWS.DynamoDB.DocumentClient()
  * Create user in DynamoDB table
  * @param {User} user 
  */
-async function registerUser(user) {
+userDAO.registerUser = async function (user) {
     // Params for DynamoDB "put"
     const params = {
         TableName: 'users',
@@ -39,7 +39,7 @@ async function registerUser(user) {
  * @param {String} dbPassword Load hash from your password DB.
  * @return {Boolean} 
  */
-function checkPassword(password, dbPassword) {
+userDAO.checkPassword = function (password, dbPassword) {
     return bcrypt.compareSync(password, dbPassword);
 }
 /**
@@ -47,7 +47,7 @@ function checkPassword(password, dbPassword) {
  * @param {String} username
  * @returns data, or false if username empty 
  */
-async function retrieveUserName(username) {
+userDAO.retrieveUserName = async function (username) {
     const params = {
         TableName: 'users',
         // IndexName: 'username',
@@ -64,8 +64,4 @@ async function retrieveUserName(username) {
 // UPDATE User
 // DELETE User
 
-module.exports = {
-    registerUser,
-    retrieveUserName,
-    checkPassword
-}
+module.exports = { userDAO }
