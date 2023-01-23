@@ -9,5 +9,4 @@ app.listen(PORT, () => {
 });
 
 
-// npm run console || node console.js
-// starts console version of ERS
+// npm run console || node console.js starts console version of ERS
