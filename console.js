@@ -4,11 +4,14 @@ const { userDAO } = require('./repository/userDAO');
 const User = require('./model/User');
 const { ticketDAO } = require('./repository/ticketDAO');
 
+// Console version does not need express, using the app would be considered secure access. 
+// This is why native apps are more secure than web applications
 
 // If login successful, returns view() to console
 login()
 // viewTickets()
-// This took 2 days to figure out
+
+// trick to work with Promise( <Pending> ) using try, catch
 async function viewTickets(id) {
     let tickets;
     try {
