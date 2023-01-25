@@ -1,8 +1,7 @@
-let uniqid = require('uniqid'); 
 
 /**
  * Ticket with ID, amount, description, ownerID, and default status of "Pending"
- * @property {uniqid} id unique identifier
+ * @property {Date} id unique identifier
  * @property {String} status default of Pending
  */
 class Ticket {
@@ -12,7 +11,7 @@ class Ticket {
      * @param {String} ownerID ID from Employee/creator of ticket
      */
     constructor(amount, description, ownerID) {
-        this.id = uniqid();
+        this.id = Date.now();
         this.amount = amount;
         this.description = description;
         this.ownerID = ownerID;

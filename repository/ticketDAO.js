@@ -19,7 +19,7 @@ ticketDAO.insertTicket = function (newTicket) {
             amount: newTicket.amount,
             description: newTicket.description,
             ownerID: newTicket.ownerID,
-            status: newTicket.status
+            status: newTicket.status,
         }
     };
     ticketDAO.put(params, (err) =>{
@@ -59,6 +59,23 @@ ticketDAO.retrieveTicketsByOwner = function (ownerID) {
     return ticketDAO.query(params).promise();
 }
 
+// Smart approach (efficient O(1))
+ticketDAO.retrievePendingTickets = function () {
+    const params = {
+        TableName: 'tickets',
+        IndexName: 'status-index',
+        KeyConditionExpression: '#status = :value',
+        ExpressionAttributeNames: {
+            '#status': 'status'
+        },
+        ExpressionAttributeValues: {
+            ':value': "Pending"
+        }
+    };
+
+    return ticketDAO.query(params).promise();
+}
+
 ticketDAO.retrieveTicketByID = function (id) {
     const params = {
         TableName: 'tickets',
@@ -70,6 +87,52 @@ ticketDAO.retrieveTicketByID = function (id) {
     return ticketDAO.get(params).promise();
 }
 // UPDATE Ticket
+ticketDAO.processTicketByID = function (id, newStatus) {
+    const params = {
+        TableName: 'tickets',
+        Key: {
+            id
+        },
+        UpdateExpression: 'set #s = :value',
+        ExpressionAttributeNames: {
+            '#s': 'status'
+        },
+        ExpressionAttributeValues: {
+            ':value': newStatus
+        }
+    }
+
+    return ticketDAO.update(params).promise();
+}
+// Retrieves first pending ticket from the table, or false if no pending tickets
+ticketDAO.popTicket = function () {
+
+    const params = {
+        TableName: 'tickets',
+        IndexName: 'status-index',
+        Limit: 1,
+        KeyConditionExpression: '#s = :value',
+        ExpressionAttributeNames: {
+            '#s': 'status'
+        },
+        ExpressionAttributeValues: {
+            ':value': 'Pending'
+        }
+    };
+
+    return ticketDAO.query(params, function(err, data){
+        if(err) {
+            console.log(err + "error")
+        } else {
+            if (data) {
+                return data.Items[0]
+            } else {
+                return false;
+            }
+          
+        }
+    }).promise()
+}
 // DELETE Ticket
 
 module.exports = { ticketDAO }

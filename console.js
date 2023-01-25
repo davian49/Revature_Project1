@@ -6,10 +6,18 @@ const { ticketDAO } = require('./repository/ticketDAO');
 
 // Console version does not need express, using the app would be considered secure access. 
 // This is why native apps are more secure than web applications
-
-// If login successful, returns view() to console
 login()
-// viewTickets()
+// If login successful, returns view() to console
+// login()
+async function getOwner() {
+    let tickets;
+    try {
+        tickets = await ticketDAO.popTicket()
+    } finally {
+        console.log(tickets)
+    }
+}
+
 
 // trick to work with Promise( <Pending> ) using try, catch
 async function viewTickets(id) {
@@ -19,6 +27,7 @@ async function viewTickets(id) {
     } catch(error) {
         console.log(error)
     } finally {
+        //console.log(tickets)
         return tickets
     }
 }
@@ -31,6 +40,18 @@ async function getTickets () {
         console.log(error)
     } finally {
         return tickets
+    }
+}
+
+async function pullTicket () {
+    let ticket;
+    try {
+        ticket = await ticketDAO.popTicket() 
+    } catch(error) {
+        console.log(error)
+    } finally {
+        console.log(ticket)
+        return ticket
     }
 }
 

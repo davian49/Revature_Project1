@@ -161,7 +161,7 @@ app.post('/submit', (req, res) => {
 // 5. Will make sure the reimbursement ticket author provides a description and amount during submission
             } else {
                 res.status(400).send({
-                    "message": "invalid ticket request"
+                    "message": "invalid ticket request, must have an amount and a description"
                 })
             }       
         } else {
@@ -232,10 +232,44 @@ app.get('/view', async (req, res) => {
     }
 });
 
+app.get('/pending', async (req, res) => {
+    // Get token value to the json body
+    const token = req.body.token;
+    // If the token is present
+    if(token){
+        // Verify the token using jwt.verify method
+        const decode = jwt.verifyAccessToken(token)
+        if (decode.role === "manager") {
+            // if role === manager or employee, return view
+            let tickets = await ticketDAO.retrievePendingTickets()
+            res.json({
+                    login: true,
+                    view: true,
+                    token: token,
+                    role: decode.role,
+                    data: tickets
+            });
+        } else {
+            res.status(404).send({
+                "message": "View access denied"
+            })
+        }
+        //  Return response with decode data        
+    } else {
+        // Return response with error
+        res.json({
+            login: false,
+            token: false,
+            view: false,
+            data: 'error',
+            message: 'Invalid Token'
+        });
+    }
+});
 
 // 7. Tickets can be processed (approved or denied) by Managers
 
-app.get('/pull', async (req, res) => {
+app.get('/pop', async (req, res) => {
     // Get token value to the json body
     const token = req.body.token;
     console.log(req.body)
@@ -246,16 +280,15 @@ app.get('/pull', async (req, res) => {
         const decode = jwt.verifyAccessToken(token)
         if (decode.role === "manager") {
             // if role === manager, pull ticket from queue
-            let queueID = await pullTicketID();
-            if (queueID) {
-                let ticket = await ticketDAO.retrieveTicketByID(queueID)
+            let queue = await ticketDAO.popTicket();
+            if (queue) {
                 // Return token, role, and ticket
                 res.json({
                     login: true,
-                    pull: true,
+                    pop: true,
                     token: token,
                     role: decode.role,
-                    data: ticket
+                    ticket: queue.Items[0]
                 });
             } else {
             res.status(404).send({
@@ -273,6 +306,53 @@ app.get('/pull', async (req, res) => {
         });
     }
 }
+});
+
+app.post('/process', async (req, res) => {
+    // Get token value to the json body
+    const token = req.body.token;
+    // If the token is present
+    if(token){
+        // Verify the token using jwt.verify method
+        const decode = jwt.verifyAccessToken(token)
+        if (decode.role === "manager") {
+            // if role === manager, pull ticket from request body
+            let ticket = req.body.ticket;
+            console.log(ticket)
+            if (ticket.status === "Approved" || ticket.status === "Denied") {
+                // updateticket to new status
+                ticketDAO.processTicketByID(ticket.id, ticket.status)
+                res.json({
+                    login: true,
+                    processed: true,
+                    token: token,
+                    role: decode.role,
+                    data: ticket
+                });
+            } else {
+                res.json({
+                    login: true,
+                    processed: false,
+                    token: token,
+                    role: decode.role,
+                    message: 'Ticket status must be processed to "Approved" or "Denied"\nPlease re-submit ticket'
+                })
+            }
+        } else {
+            res.status(404).send({
+                "message": "View access denied"
+            })
+        }
+        //  Return response with decode data        
+    } else {
+        // Return response with error
+        res.json({
+            login: false,
+            token: false,
+            data: 'error',
+            message: 'invalid token'
+        });
+    }
 });
 
 
