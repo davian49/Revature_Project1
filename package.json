@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest",
-    "console": "node console.js"
+    "console": "node console.js",
+    "view": "node ./views/app.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
     "aws-sdk": "^2.1296.0",
     "bcrypt": "^5.1.0",
     "bootstrap": "^5.2.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",

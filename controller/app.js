@@ -4,6 +4,13 @@ const { ticketDAO } = require('../repository/ticketDAO');
 const { jwt } = require('./util/jwt-util');
 const User = require('../model/User');
 const Ticket = require('../model/Ticket');
+const path = require('path')
+
+
+app.get('/', function (req, res) {
+    let index = path.resolve(__dirname + '/../views/index.html')
+    res.sendFile(index)
+  });
 
 // 1. Can use a username and password to log in
 app.post('/login', async (req, res) => {
